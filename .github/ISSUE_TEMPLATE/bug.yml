@@ -1,0 +1,52 @@
+name: Bug
+description: Signaler un comportement incorrect
+title: "[Domaine] Bug : description courte"
+labels: ["type: bug"]
+body:
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Partie concernée
+      options: [mobile, backoffice, api, ai, db, infra]
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Étapes pour reproduire
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportement attendu
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Comportement observé
+    validations:
+      required: true
+  - type: textarea
+    id: env
+    attributes:
+      label: Environnement
+      placeholder: "Appareil, OS, version de l'app, environnement (dev/staging/prod)"
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs, captures
+      description: Retirer toute donnée personnelle avant de coller
+      render: text
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Gravité
+      options: [Bloquant, Majeur, Mineur, Cosmétique]
+    validations:
+      required: true
