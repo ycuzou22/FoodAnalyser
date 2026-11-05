@@ -1,0 +1,9 @@
+node_modules
+pnpm-lock.yaml
+dist
+build
+coverage
+.venv
+services/**/*.py
+**/*.md
+.github/ISSUE_TEMPLATE
