@@ -1,0 +1,41 @@
+name: repo-ci
+
+# Vérifications transverses : formatage des fichiers racine, ESLint partagé,
+# tests du vérificateur de messages de commit, validation du Compose.
+
+on:
+  pull_request:
+  push:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: format, lint racine et scripts
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Prettier + ESLint
+        run: pnpm lint
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Tests du vérificateur de commits
+        run: python -m unittest discover -s infra/scripts -v
+      - name: Validation du Docker Compose
+        run: docker compose -f infra/docker/compose.dev.yml --env-file infra/docker/.env.example config -q
+      - name: Syntaxe des scripts shell
+        run: for f in infra/scripts/*.sh; do bash -n "$f"; done

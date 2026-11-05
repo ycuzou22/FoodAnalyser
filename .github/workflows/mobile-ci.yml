@@ -1,0 +1,55 @@
+name: mobile-ci
+
+# Prêt pour l'application React Native (issue #7). Tant que apps/mobile/package.json
+# n'existe pas, le job s'arrête après l'étape de détection.
+
+on:
+  pull_request:
+    paths:
+      - 'apps/mobile/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/mobile-ci.yml'
+  push:
+    branches: [main, develop]
+    paths:
+      - 'apps/mobile/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/mobile-ci.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: lint, typage et tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - id: app
+        name: Détection de l'application
+        run: |
+          if [ -f apps/mobile/package.json ]; then echo "exists=true" >> "$GITHUB_OUTPUT"
+          else echo "exists=false" >> "$GITHUB_OUTPUT"; echo "::notice::apps/mobile pas encore initialisée"; fi
+      - if: steps.app.outputs.exists == 'true'
+        uses: pnpm/action-setup@v4
+      - if: steps.app.outputs.exists == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - if: steps.app.outputs.exists == 'true'
+        run: pnpm install --frozen-lockfile
+      - if: steps.app.outputs.exists == 'true'
+        name: ESLint
+        run: pnpm --filter ./apps/mobile exec eslint .
+      - if: steps.app.outputs.exists == 'true'
+        name: TypeScript
+        run: pnpm --filter ./apps/mobile exec tsc --noEmit
+      - if: steps.app.outputs.exists == 'true'
+        name: Jest
+        run: pnpm --filter ./apps/mobile test --ci

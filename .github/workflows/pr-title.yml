@@ -1,0 +1,31 @@
+name: pr-title
+
+# Le titre de PR devient le message du commit « squash » : il doit respecter la norme.
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: format du titre
+    # Dependabot ne peut pas citer d'issue ; ses titres sont préfixés via dependabot.yml.
+    if: github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: infra/scripts
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Vérification
+        # Le titre passe par une variable d'environnement, jamais interpolé dans le script :
+        # un titre malveillant ne peut pas injecter de commande dans le runner.
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: python infra/scripts/check_commit_msg.py --text "$PR_TITLE"

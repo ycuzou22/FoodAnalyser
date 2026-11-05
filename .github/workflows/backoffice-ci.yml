@@ -1,0 +1,54 @@
+name: backoffice-ci
+
+# Prêt pour le back-office (issue #8). Tant que apps/backoffice/package.json n'existe pas,
+# le job s'arrête après l'étape de détection.
+
+on:
+  pull_request:
+    paths:
+      - 'apps/backoffice/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/backoffice-ci.yml'
+  push:
+    branches: [main, develop]
+    paths:
+      - 'apps/backoffice/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/backoffice-ci.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: lint, typage, tests et build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - id: app
+        name: Détection de l'application
+        run: |
+          if [ -f apps/backoffice/package.json ]; then echo "exists=true" >> "$GITHUB_OUTPUT"
+          else echo "exists=false" >> "$GITHUB_OUTPUT"; echo "::notice::apps/backoffice pas encore initialisé"; fi
+      - if: steps.app.outputs.exists == 'true'
+        uses: pnpm/action-setup@v4
+      - if: steps.app.outputs.exists == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - if: steps.app.outputs.exists == 'true'
+        run: pnpm install --frozen-lockfile
+      - if: steps.app.outputs.exists == 'true'
+        run: pnpm --filter ./apps/backoffice exec eslint .
+      - if: steps.app.outputs.exists == 'true'
+        run: pnpm --filter ./apps/backoffice exec tsc --noEmit
+      - if: steps.app.outputs.exists == 'true'
+        run: pnpm --filter ./apps/backoffice exec vitest run
+      - if: steps.app.outputs.exists == 'true'
+        run: pnpm --filter ./apps/backoffice build

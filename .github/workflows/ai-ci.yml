@@ -1,0 +1,40 @@
+name: ai-ci
+
+on:
+  pull_request:
+    paths:
+      - 'services/ai/**'
+      - '.github/workflows/ai-ci.yml'
+  push:
+    branches: [main, develop]
+    paths:
+      - 'services/ai/**'
+      - '.github/workflows/ai-ci.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: services/ai
+
+jobs:
+  check:
+    name: lint, typage et tests (sans GPU)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: services/ai/uv.lock
+      - run: uv sync --frozen
+      - run: uv run ruff check --output-format=github .
+      - run: uv run ruff format --check .
+      - run: uv run mypy
+      - run: uv run pytest
