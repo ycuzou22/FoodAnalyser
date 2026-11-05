@@ -6,5 +6,12 @@ packages:
 minimumReleaseAge: 10080
 # Refuse une version dont la provenance est moins fiable que la précédente.
 trustPolicy: no-downgrade
+# Exemptions : une version précise, jamais un paquet entier. Chaque ligne est justifiée et
+# validée par le responsable du dépôt.
+trustPolicyExclude:
+  # Correctif de la CVE-2022-25883 publié en juillet 2023 sur la branche 6 sans attestation,
+  # après des versions 7 qui en avaient une. Requis par @babel/core, donc par React Native.
+  # Validé le 2026-11-05 (issue #7).
+  - 'semver@6.3.1'
 # Interdit aux dépendances transitives de venir d'une URL ou d'un dépôt Git.
 blockExoticSubdeps: true

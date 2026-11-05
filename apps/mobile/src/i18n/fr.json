@@ -1,0 +1,33 @@
+{
+  "common": {
+    "retry": "Réessayer",
+    "comingSoon": "Bientôt disponible"
+  },
+  "tabs": {
+    "journal": "Journal",
+    "stats": "Statistiques",
+    "camera": "Photo",
+    "cameraHint": "Photographier un repas",
+    "recipes": "Recettes",
+    "profile": "Profil"
+  },
+  "screens": {
+    "journal": { "title": "Journal du jour", "issue": "Arrive avec l'issue #29" },
+    "stats": { "title": "Statistiques", "issue": "Arrive avec l'issue #44" },
+    "camera": { "title": "Photographier un repas", "issue": "Arrive avec l'issue #24" },
+    "recipes": { "title": "Recettes et programmes", "issue": "Arrive avec l'issue #48" },
+    "profile": { "title": "Profil", "issue": "Arrive avec l'issue #18" }
+  },
+  "welcome": {
+    "title": "FoodAnalyser",
+    "subtitle": "Photographiez votre assiette, on s'occupe du reste.",
+    "issue": "Inscription et connexion : issue #16"
+  },
+  "offline": {
+    "banner": "Hors ligne : vos données s'afficheront dès le retour du réseau."
+  },
+  "error": {
+    "title": "Une erreur est survenue",
+    "body": "L'application a rencontré un problème inattendu. Vos données ne sont pas perdues."
+  }
+}
