@@ -24,3 +24,18 @@ Toutes les règles détaillées sont dans [docs/conventions.md](docs/conventions
 - [ ] Documentation mise à jour (README, OpenAPI, ADR si décision)
 - [ ] Aucun secret, aucune donnée personnelle réelle dans le code ou les fixtures
 - [ ] PR relue et approuvée
+
+## Intégration continue
+
+| Workflow | Déclenché par | Vérifie |
+| --- | --- | --- |
+| `repo-ci` | toutes les PR | Prettier, ESLint, vérificateur de commits, Compose, scripts shell |
+| `pr-title` | toutes les PR | Titre au format `[TAG] portée: description (#n°)` |
+| `security` | toutes les PR + chaque lundi | gitleaks (historique complet), Semgrep (OWASP Top 10), Trivy (CVE et Dockerfile) |
+| `api-ci` | `services/api/**` | Ruff, mypy strict, pytest + intégration PostgreSQL 16, couverture ≥ 70 % commentée sur la PR |
+| `ai-ci` | `services/ai/**` | Ruff, mypy, pytest |
+| `mobile-ci` / `backoffice-ci` | `apps/…/**` | ESLint, TypeScript, tests (et build pour le back-office) |
+
+Dependabot propose chaque lundi les mises à jour regroupées (uv, npm, Docker, Actions) vers `develop`.
+
+La protection de `main` et `develop` se configure une fois avec `bash infra/scripts/protect-branches.sh`.

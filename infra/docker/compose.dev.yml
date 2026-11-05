@@ -1,0 +1,138 @@
+# Environnement de développement local. Ne sert PAS en production (voir infra/k8s).
+#
+#   cp infra/docker/.env.example infra/docker/.env   # une fois, puis adapter
+#   make up                                          # démarre tout
+#
+# Les ports ne sont publiés que sur 127.0.0.1 : rien n'est exposé au réseau local.
+
+name: foodanalyser
+
+x-healthcheck-defaults: &healthcheck-defaults
+  interval: 5s
+  timeout: 5s
+  retries: 10
+  start_period: 10s
+
+services:
+  postgres:
+    image: postgres:16.6-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?définir POSTGRES_DB dans infra/docker/.env}
+      POSTGRES_USER: ${POSTGRES_USER:?définir POSTGRES_USER dans infra/docker/.env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?définir POSTGRES_PASSWORD dans infra/docker/.env}
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    ports:
+      - '127.0.0.1:${POSTGRES_PORT:-5432}:5432'
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ['CMD-SHELL', 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+    networks: [foodanalyser-dev]
+
+  redis:
+    image: redis:7.4-alpine
+    command: ['redis-server', '--appendonly', 'yes']
+    volumes:
+      - redis-data:/data
+    ports:
+      - '127.0.0.1:${REDIS_PORT:-6379}:6379'
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ['CMD', 'redis-cli', 'ping']
+    networks: [foodanalyser-dev]
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:?définir RABBITMQ_USER dans infra/docker/.env}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:?définir RABBITMQ_PASSWORD dans infra/docker/.env}
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    ports:
+      - '127.0.0.1:${RABBITMQ_PORT:-5672}:5672'
+      - '127.0.0.1:${RABBITMQ_MANAGEMENT_PORT:-15672}:15672'
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ['CMD', 'rabbitmq-diagnostics', '-q', 'ping']
+      start_period: 30s
+    networks: [foodanalyser-dev]
+
+  minio:
+    image: minio/minio:RELEASE.2024-12-18T13-15-44Z
+    command: ['server', '/data', '--console-address', ':9001']
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?définir MINIO_ROOT_USER dans infra/docker/.env}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?définir MINIO_ROOT_PASSWORD dans infra/docker/.env}
+    volumes:
+      - minio-data:/data
+    ports:
+      - '127.0.0.1:${MINIO_PORT:-9000}:9000'
+      - '127.0.0.1:${MINIO_CONSOLE_PORT:-9001}:9001'
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ['CMD', 'mc', 'ready', 'local']
+    networks: [foodanalyser-dev]
+
+  # Tâche ponctuelle : crée le bucket privé des photos puis s'arrête.
+  minio-init:
+    image: minio/mc:RELEASE.2024-11-21T17-21-54Z
+    entrypoint: ['/bin/sh', '/init-minio.sh']
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_BUCKET: ${MINIO_BUCKET:-meal-photos}
+    volumes:
+      - ../scripts/init-minio.sh:/init-minio.sh:ro
+    depends_on:
+      minio:
+        condition: service_healthy
+    restart: 'no'
+    networks: [foodanalyser-dev]
+
+  api:
+    build:
+      context: ../../services/api
+      target: dev
+    environment:
+      API_ENV: development
+      API_LOG_LEVEL: ${API_LOG_LEVEL:-INFO}
+      API_DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      API_REDIS_URL: redis://redis:6379/0
+      API_RABBITMQ_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672/
+      API_CORS_ORIGINS: '["http://localhost:5173"]'
+    volumes:
+      # Code monté en lecture seule : uvicorn --reload recharge à chaque modification.
+      - ../../services/api/app:/app/app:ro
+      - ../../services/api/migrations:/app/migrations:ro
+      - ../../services/api/alembic.ini:/app/alembic.ini:ro
+    ports:
+      - '127.0.0.1:${API_PORT:-8000}:8000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+    healthcheck:
+      <<: *healthcheck-defaults
+      test:
+        [
+          'CMD',
+          'python',
+          '-c',
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2)",
+        ]
+    networks: [foodanalyser-dev]
+
+volumes:
+  pg-data:
+  redis-data:
+  rabbitmq-data:
+  minio-data:
+
+networks:
+  foodanalyser-dev:
+    name: foodanalyser-dev

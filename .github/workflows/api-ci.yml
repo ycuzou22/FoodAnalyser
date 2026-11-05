@@ -1,0 +1,88 @@
+name: api-ci
+
+on:
+  pull_request:
+    paths:
+      - 'services/api/**'
+      - '.github/workflows/api-ci.yml'
+  push:
+    branches: [main, develop]
+    paths:
+      - 'services/api/**'
+      - '.github/workflows/api-ci.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: services/api
+
+jobs:
+  lint:
+    name: lint et typage
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: services/api/uv.lock
+      - run: uv sync --frozen
+      - name: Ruff (lint)
+        run: uv run ruff check --output-format=github .
+      - name: Ruff (format)
+        run: uv run ruff format --check .
+      - name: mypy
+        run: uv run mypy
+
+  test:
+    name: tests (PostgreSQL 16)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pull-requests: write # commentaire de couverture
+    services:
+      postgres:
+        image: postgres:16.6-alpine
+        env:
+          POSTGRES_DB: foodanalyser_test
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci-only-password
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U ci -d foodanalyser_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+      redis:
+        image: redis:7.4-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      API_TEST_DATABASE_URL: postgresql+asyncpg://ci:ci-only-password@localhost:5432/foodanalyser_test
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: services/api/uv.lock
+      - run: uv sync --frozen
+      - name: pytest (unitaires + intégration) avec couverture
+        run: >-
+          uv run pytest --cov --cov-report=term-missing:skip-covered
+          --cov-report=xml:coverage.xml --junitxml=pytest.xml
+      - name: Commentaire de couverture sur la PR
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        uses: MishaKav/pytest-coverage-comment@9516bf7f32a9229cf18d5e1717ae387c7154f279 # v1
+        with:
+          pytest-xml-coverage-path: services/api/coverage.xml
+          junitxml-path: services/api/pytest.xml
+          title: Couverture services/api
+          unique-id-for-comment: api

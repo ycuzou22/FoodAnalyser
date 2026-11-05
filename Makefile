@@ -2,9 +2,11 @@
 # Sous Windows : utiliser Git Bash (make fourni par Git for Windows / Chocolatey), ou lancer les commandes affichées à la main.
 
 PY_SERVICES := services/api services/ai
+COMPOSE_ENV := infra/docker/.env
+COMPOSE := docker compose -f infra/docker/compose.dev.yml --env-file $(COMPOSE_ENV)
 
 .DEFAULT_GOAL := help
-.PHONY: help install lint format test
+.PHONY: help install lint format test up down logs ps reset-db migrate check-env
 
 help: ## Affiche cette aide
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
@@ -27,3 +29,32 @@ test: ## Lance tous les tests
 	pnpm test
 	@for s in $(PY_SERVICES); do echo "→ tests $$s"; (cd $$s && uv run pytest) || exit 1; done
 	python3 -m unittest discover -s infra/scripts -q
+
+# --- Environnement Docker de développement -----------------------------------
+
+check-env:
+	@test -f $(COMPOSE_ENV) || { echo "✗ $(COMPOSE_ENV) manquant : cp infra/docker/.env.example $(COMPOSE_ENV)"; exit 1; }
+
+up: check-env ## Démarre PostgreSQL, Redis, RabbitMQ, MinIO et l'API (http://localhost:8000)
+	$(COMPOSE) up -d --build --wait
+	$(COMPOSE) exec api alembic upgrade head
+	@echo "✔ API : http://localhost:8000/docs · RabbitMQ : http://localhost:15672 · MinIO : http://localhost:9001"
+
+down: check-env ## Arrête l'environnement (les données sont conservées)
+	$(COMPOSE) down
+
+logs: check-env ## Suit les logs (make logs s=api pour un seul service)
+	$(COMPOSE) logs -f $(s)
+
+ps: check-env ## État des conteneurs
+	$(COMPOSE) ps
+
+reset-db: check-env ## Repart d'une base PostgreSQL vide
+	$(COMPOSE) stop api postgres
+	$(COMPOSE) rm -f postgres
+	docker volume rm -f foodanalyser_pg-data
+	$(COMPOSE) up -d --wait postgres api
+	$(COMPOSE) exec api alembic upgrade head
+
+migrate: check-env ## Applique les migrations de base de données
+	$(COMPOSE) exec api alembic upgrade head
