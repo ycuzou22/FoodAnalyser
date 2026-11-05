@@ -31,6 +31,8 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-install-project
 # Le code est monté par le Compose ; cette copie sert si l'image est lancée seule.
 COPY app ./app
+COPY migrations ./migrations
+COPY alembic.ini ./
 USER app
 EXPOSE 8000
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--reload-dir", "app"]
@@ -46,6 +48,8 @@ WORKDIR /app
 COPY --from=builder /opt/venv /opt/venv
 # Code possédé par root et lisible seulement : le processus (utilisateur app) ne peut pas le modifier.
 COPY app ./app
+COPY migrations ./migrations
+COPY alembic.ini ./
 USER app
 EXPOSE 8000
 HEALTHCHECK --interval=10s --timeout=3s --start-period=10s --retries=3 \
