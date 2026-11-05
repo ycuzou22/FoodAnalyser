@@ -55,7 +55,9 @@ Corps facultatif : pourquoi le changement, pas comment.
 | `[MERGE]` | Commit de fusion |
 | `[RELEASE]` | Préparation d'une version |
 
-Portées autorisées : `mobile`, `backoffice`, `api`, `ai`, `db`, `infra`, `ci`, `docs`, `repo`.
+Portées autorisées : `mobile`, `backoffice`, `api`, `ai`, `db`, `infra`, `ci`, `docs`, `repo`. La portée est facultative pour `[MERGE]` et `[RELEASE]`.
+
+Le hook `commit-msg` (`infra/scripts/check_commit_msg.py`) applique ces règles à chaque commit ; les messages générés par Git (`Merge branch…`, `Revert "…"`, `fixup!`) sont acceptés.
 
 Exemples :
 

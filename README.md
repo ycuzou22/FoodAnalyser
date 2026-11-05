@@ -40,4 +40,35 @@ docs/              exigences, conventions, architecture, ADR
 
 ## Démarrage
 
-Les instructions d'installation arrivent avec l'issue d'initialisation du socle technique (milestone *M1 - Cadrage et design*).
+### Prérequis
+
+| Outil | Version | Installation |
+| --- | --- | --- |
+| Node.js | 20 LTS ou plus | [nodejs.org](https://nodejs.org/) |
+| pnpm | 10 | `corepack enable` |
+| Python | 3.12 ou plus | [python.org](https://www.python.org/) |
+| uv | dernière | `pip install uv` ou [docs.astral.sh/uv](https://docs.astral.sh/uv/) |
+| Go | 1.22 ou plus | requis une fois par pre-commit pour construire gitleaks |
+| make | — | inclus sous Linux / macOS ; sous Windows, utiliser Git Bash |
+
+### Installation
+
+```bash
+git clone https://github.com/ycuzou22/FoodAnalyser.git
+cd FoodAnalyser
+make install      # dépendances JS + Python + hooks Git
+```
+
+### Commandes courantes
+
+| Commande | Effet |
+| --- | --- |
+| `make lint` | Prettier, ESLint, Ruff, mypy, tests du vérificateur de commits |
+| `make format` | Reformate tout le dépôt |
+| `make test` | Tous les tests |
+
+### Hooks Git
+
+À chaque commit, les hooks reformatent le code (Ruff, Prettier), cherchent des secrets (gitleaks, clés privées) et vérifient le message au format `[TAG] portée: description (#n°)`. Un message non conforme est refusé avec l'explication du format attendu.
+
+Copier chaque `.env.example` en `.env` avant de lancer un service.

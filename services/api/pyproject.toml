@@ -1,0 +1,49 @@
+[project]
+name = "foodanalyser-api"
+version = "0.1.0"
+description = "API REST de FoodAnalyser (FastAPI)"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "mypy>=1.13",
+    "pytest>=8.3",
+    "pytest-cov>=6.0",
+    "ruff>=0.8",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["app", "tests"]
+
+[tool.ruff.lint]
+# E/F : pycodestyle + pyflakes · I : imports · B : bugbear · UP : pyupgrade
+# S : bandit (sécurité) · N : nommage PEP 8 · SIM : simplifications · ASYNC : pièges asyncio
+select = ["E", "F", "I", "B", "UP", "S", "N", "SIM", "ASYNC"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = ["S101"] # assert autorisé dans les tests
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["app"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+
+[tool.coverage.run]
+source = ["app"]
+branch = true
+
+[tool.coverage.report]
+fail_under = 70
+show_missing = true
+skip_empty = true
