@@ -1,0 +1,62 @@
+version: 2
+
+# Mises à jour hebdomadaires, regroupées pour limiter le nombre de PR.
+# Les PR ciblent develop et suivent la norme de commit ([DEPS] portée: ...).
+# cooldown : une version n'est proposée qu'après 7 jours, le temps qu'une publication
+# malveillante soit détectée et retirée (cf. compromission de trivy-action, mars 2026).
+
+updates:
+  - package-ecosystem: uv
+    directory: /services/api
+    target-branch: develop
+    schedule: { interval: weekly, day: monday }
+    cooldown: { default-days: 7 }
+    commit-message: { prefix: '[DEPS] api:' }
+    labels: ['type: chore', 'scope: api']
+    groups:
+      api-dependencies:
+        patterns: ['*']
+        update-types: [minor, patch]
+
+  - package-ecosystem: uv
+    directory: /services/ai
+    target-branch: develop
+    schedule: { interval: weekly, day: monday }
+    cooldown: { default-days: 7 }
+    commit-message: { prefix: '[DEPS] ai:' }
+    labels: ['type: chore', 'scope: ai']
+    groups:
+      ai-dependencies:
+        patterns: ['*']
+        update-types: [minor, patch]
+
+  - package-ecosystem: npm
+    directory: /
+    target-branch: develop
+    schedule: { interval: weekly, day: monday }
+    cooldown: { default-days: 7 }
+    commit-message: { prefix: '[DEPS] repo:' }
+    labels: ['type: chore', 'scope: ci']
+    groups:
+      js-dependencies:
+        patterns: ['*']
+        update-types: [minor, patch]
+
+  - package-ecosystem: docker
+    directory: /services/api
+    target-branch: develop
+    schedule: { interval: weekly, day: monday }
+    cooldown: { default-days: 7 }
+    commit-message: { prefix: '[DEPS] infra:' }
+    labels: ['type: chore', 'scope: infra']
+
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: develop
+    schedule: { interval: weekly, day: monday }
+    cooldown: { default-days: 7 }
+    commit-message: { prefix: '[DEPS] ci:' }
+    labels: ['type: chore', 'scope: ci']
+    groups:
+      actions:
+        patterns: ['*']

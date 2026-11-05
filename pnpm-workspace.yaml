@@ -1,2 +1,10 @@
 packages:
   - 'apps/*'
+
+# Durcissement de la chaîne d'approvisionnement
+# Une version publiée il y a moins de 7 jours n'est pas installée (en minutes).
+minimumReleaseAge: 10080
+# Refuse une version dont la provenance est moins fiable que la précédente.
+trustPolicy: no-downgrade
+# Interdit aux dépendances transitives de venir d'une URL ou d'un dépôt Git.
+blockExoticSubdeps: true
