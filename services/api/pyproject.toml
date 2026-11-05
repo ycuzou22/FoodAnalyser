@@ -4,12 +4,24 @@ version = "0.1.0"
 description = "API REST de FoodAnalyser (FastAPI)"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "aio-pika>=9.5",
+    "alembic>=1.14",
+    "asyncpg>=0.30",
+    "fastapi>=0.115",
+    "pydantic-settings>=2.6",
+    "redis>=5.2",
+    "sqlalchemy[asyncio]>=2.0.36",
+    "structlog>=24.4",
+    "uvicorn[standard]>=0.32",
+]
 
 [dependency-groups]
 dev = [
+    "httpx>=0.28",
     "mypy>=1.13",
     "pytest>=8.3",
+    "pytest-asyncio>=0.24",
     "pytest-cov>=6.0",
     "ruff>=0.8",
 ]
@@ -17,12 +29,16 @@ dev = [
 [tool.ruff]
 line-length = 100
 target-version = "py312"
-src = ["app", "tests"]
+src = ["."]
 
 [tool.ruff.lint]
 # E/F : pycodestyle + pyflakes · I : imports · B : bugbear · UP : pyupgrade
 # S : bandit (sécurité) · N : nommage PEP 8 · SIM : simplifications · ASYNC : pièges asyncio
 select = ["E", "F", "I", "B", "UP", "S", "N", "SIM", "ASYNC"]
+
+[tool.ruff.lint.isort]
+# Explicite : le hook pre-commit lance ruff depuis la racine du dépôt.
+known-first-party = ["app"]
 
 [tool.ruff.lint.per-file-ignores]
 "**/tests/**" = ["S101"] # assert autorisé dans les tests
@@ -38,6 +54,8 @@ files = ["app"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra --strict-markers"
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
 
 [tool.coverage.run]
 source = ["app"]

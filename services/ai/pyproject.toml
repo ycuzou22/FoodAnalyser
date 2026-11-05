@@ -21,6 +21,10 @@ src = ["training", "inference", "datasets", "tests"]
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "S", "N", "SIM"]
 
+[tool.ruff.lint.isort]
+# Explicite : le hook pre-commit lance ruff depuis la racine du dépôt.
+known-first-party = ["training", "inference"]
+
 [tool.ruff.lint.per-file-ignores]
 "**/tests/**" = ["S101"]
 
