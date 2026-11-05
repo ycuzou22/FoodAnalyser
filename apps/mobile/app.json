@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "name": "FoodAnalyser",
+    "slug": "foodanalyser",
+    "scheme": "foodanalyser",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "bundleIdentifier": "app.foodanalyser.mobile",
+      "supportsTablet": false,
+      "config": {
+        "usesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "app.foodanalyser.mobile",
+      "allowBackup": false,
+      "edgeToEdgeEnabled": true
+    },
+    "plugins": [
+      [
+        "expo-secure-store",
+        {
+          "configureAndroidBackup": true,
+          "faceIDPermission": false
+        }
+      ],
+      "expo-localization"
+    ]
+  }
+}

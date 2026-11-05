@@ -48,3 +48,9 @@ mlruns/
 !.vscode/extensions.json
 .DS_Store
 Thumbs.db
+
+# Expo : projets natifs générés par « expo prebuild », jamais versionnés
+apps/mobile/ios/
+apps/mobile/android/
+apps/mobile/.expo/
+apps/mobile/.env.local
