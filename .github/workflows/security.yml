@@ -21,10 +21,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0 # tout l'historique : un secret supprimé reste dans Git
-      - uses: gitleaks/gitleaks-action@v2
+      - uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -35,7 +35,7 @@ jobs:
     container:
       image: semgrep/semgrep:1.99.0
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Semgrep (Python, TypeScript, OWASP Top 10, secrets, Dockerfile)
         run: >-
           semgrep scan --error --metrics=off
@@ -43,23 +43,29 @@ jobs:
           --config p/secrets --config p/dockerfile
           --exclude "**/tests/**" --exclude "**/uv.lock" --exclude "pnpm-lock.yaml"
 
+  # trivy-action a été compromise en mars 2026 (GHSA-69fq-xp46-6x23) : ses anciens tags ont
+  # été réécrits puis supprimés. On utilise un tag publié en release immuable et on fixe la
+  # version du binaire Trivy (jamais « latest »).
   dependencies:
     name: dépendances et configuration (Trivy)
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: CVE des dépendances (uv.lock, pnpm-lock.yaml)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0 # tag immuable, voir commentaire
         with:
           scan-type: fs
           scanners: vuln
           severity: CRITICAL,HIGH
           ignore-unfixed: true
           exit-code: '1'
+          version: v0.70.0
       - name: Erreurs de configuration (Dockerfile, Compose)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0 # tag immuable, voir commentaire
         with:
           scan-type: config
           severity: CRITICAL,HIGH
           exit-code: '1'
+          version: v0.70.0
+          skip-setup-trivy: true # binaire déjà installé par l'étape précédente
