@@ -8,6 +8,8 @@ repos:
     hooks:
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
+        # Les fixtures reproduisent des fichiers réels : une tabulation finale est une colonne vide.
+        exclude: ^services/api/tests/fixtures/
       - id: end-of-file-fixer
       - id: mixed-line-ending
         args: [--fix=lf]

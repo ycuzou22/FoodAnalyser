@@ -1,0 +1,9 @@
+code	url	product_name	product_name_fr	brands	countries_tags	nutriscore_grade	unique_scans_n	energy-kj_100g	energy-kcal_100g	energy_100g	fat_100g	carbohydrates_100g	proteins_100g	fiber_100g	salt_100g
+3017620422003	u	Nutella	Pâte à tartiner aux noisettes et au cacao	Nutella,Ferrero	en:france,en:belgium	e	1520	2252	539	2252	30.9	57.5	6.3		0.107
+3000000000014	u	Yogurt		Marque A	en:france	a	12			251	2.5	5	4.3		0.13
+3000000000021	u	Biscuits	Biscuits secs	Marque B	en:spain	c	3		450		15	70	7	3	0.5
+3000000000020	u	Faux	Code faux	Marque C	en:france	b	1		100		1	1	1		0.1
+3000000000038	u	Soda	Soda zéro	Marque D	en:france	unknown	40		1		0	0.1	0		0.02
+3000000000045	u	Incomplet	Produit sans macros	Marque E	en:france		0		120						
+3000000000052	u	Ancien	Ancien nom	Marque F	en:france	d	2		200		5	30	3		1
+3000000000052	u	Nouveau	Nouveau nom	Marque F	en:france	c	5		210		5	30	3		1

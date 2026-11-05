@@ -35,6 +35,9 @@ venv/
 htmlcov/
 .coverage
 
+# Fichiers sources des aliments (plusieurs Go, licences propres) : voir docs/sources-donnees.md
+/data/
+
 # IA : jamais de poids ni d'images dans Git
 services/ai/data/
 services/ai/models/**/*.pt

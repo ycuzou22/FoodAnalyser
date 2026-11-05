@@ -1,6 +1,6 @@
 # Modèle de données
 
-Schéma PostgreSQL 16 défini par les modèles SQLAlchemy (`services/api/app/models/`) et créé par la migration `0001_initial_schema`. Un test d'intégration vérifie que modèles et migrations ne divergent pas.
+Schéma PostgreSQL 16 défini par les modèles SQLAlchemy (`services/api/app/models/`) et créé par les migrations `0001_initial_schema` et `0002_food_source_imports`. Un test d'intégration vérifie que modèles et migrations ne divergent pas.
 
 ```mermaid
 erDiagram
@@ -135,6 +135,7 @@ erDiagram
 | Valeurs plausibles | Contraintes `CHECK` (poids 20-400 kg, quantité > 0, Nutri-Score a-e…) | tests d'intégration |
 | Consentements traçables | `consents` en ajout seul, consentement courant = ligne la plus récente | — (issue #17) |
 | Données de santé identifiées | `info={"health_data": True}` sur 12 colonnes | `test_health_data_columns_are_marked` |
+| Provenance des aliments tracée | Table `food_source_imports` : source, version, licence, volumes, rejets par motif (hors diagramme, sans lien avec les utilisateurs) | `test_import_is_idempotent_and_traced` |
 | Données analytiques isolées | Schéma `analytics` séparé (vide pour l'instant) | migration 0001 |
 
 ## Données de santé et chiffrement
