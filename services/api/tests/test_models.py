@@ -23,6 +23,7 @@ EXPECTED_TABLES = {
     "water_logs",
     "subscriptions",
     "consents",
+    "food_source_imports",
 }
 
 

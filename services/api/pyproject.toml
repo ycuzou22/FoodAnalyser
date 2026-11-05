@@ -9,11 +9,13 @@ dependencies = [
     "alembic>=1.14",
     "asyncpg>=0.30",
     "fastapi>=0.115",
+    "openpyxl>=3.1",
     "pydantic-settings>=2.6",
     "redis>=5.2",
     "sqlalchemy[asyncio]>=2.0.36",
     "structlog>=24.4",
     "uvicorn[standard]>=0.32",
+    "xlrd>=2.0",
 ]
 
 [dependency-groups]
@@ -24,6 +26,8 @@ dev = [
     "pytest-asyncio>=0.24",
     "pytest-cov>=6.0",
     "ruff>=0.8",
+    "types-openpyxl>=3.1.5.20261017",
+    "types-xlrd>=2.0.0.20260518",
 ]
 
 [tool.ruff]

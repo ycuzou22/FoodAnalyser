@@ -6,7 +6,7 @@ COMPOSE_ENV := infra/docker/.env
 COMPOSE := docker compose -f infra/docker/compose.dev.yml --env-file $(COMPOSE_ENV)
 
 .DEFAULT_GOAL := help
-.PHONY: help install lint format test up down logs ps reset-db migrate check-env
+.PHONY: help install lint format test up down logs ps reset-db migrate import-foods check-env
 
 help: ## Affiche cette aide
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
@@ -58,3 +58,8 @@ reset-db: check-env ## Repart d'une base PostgreSQL vide
 
 migrate: check-env ## Applique les migrations de base de données
 	$(COMPOSE) exec api alembic upgrade head
+
+import-foods: check-env ## Importe CIQUAL et/ou Open Food Facts depuis data/foods (voir docs/sources-donnees.md)
+	@test -n "$(CIQUAL)$(OFF)" || { echo "✗ Préciser CIQUAL=<fichier> et/ou OFF=<fichier> (dans data/foods/)"; exit 1; }
+	@if [ -n "$(CIQUAL)" ]; then $(COMPOSE) exec api python -m app.scripts.import_foods ciqual /data/foods/$(CIQUAL) --version $(or $(CIQUAL_VERSION),inconnue); fi
+	@if [ -n "$(OFF)" ]; then $(COMPOSE) exec api python -m app.scripts.import_foods off /data/foods/$(OFF) --version $(or $(OFF_VERSION),$(shell date +%F)); fi

@@ -105,6 +105,8 @@ services:
       - ../../services/api/app:/app/app:ro
       - ../../services/api/migrations:/app/migrations:ro
       - ../../services/api/alembic.ini:/app/alembic.ini:ro
+      # Fichiers sources des aliments (CIQUAL, Open Food Facts), jamais commités.
+      - ../../data/foods:/data/foods:ro
     ports:
       - '127.0.0.1:${API_PORT:-8000}:8000'
     depends_on:

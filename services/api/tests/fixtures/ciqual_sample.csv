@@ -1,0 +1,8 @@
+alim_grp_code;alim_ssgrp_code;alim_ssssgrp_code;alim_grp_nom_fr;alim_ssgrp_nom_fr;alim_ssssgrp_nom_fr;alim_code;alim_nom_fr;alim_nom_sci;Energie, Règlement UE N° 1169/2011 (kJ/100 g);Energie, Règlement UE N° 1169/2011 (kcal/100 g);Energie, N x facteur Jones, avec fibres  (kJ/100 g);Energie, N x facteur Jones, avec fibres  (kcal/100 g);Eau (g/100 g);Protéines, N x facteur de Jones (g/100 g);Protéines, N x 6.25 (g/100 g);Glucides (g/100 g);Lipides (g/100 g);Sucres (g/100 g);Fibres alimentaires (g/100 g);Sel chlorure de sodium (g/100 g)
+01;0101;000000;grp;sgrp;ssgrp;13005;Banane, pulpe, crue;;377;89,2;400;95;74,4;1,06;1,2;19,7;0,25;14,8;2,7;traces
+01;0101;000000;grp;sgrp;ssgrp;20047;Pomme, pulpe et peau, crue;;220;52,4;230;55;85,6;0,25;0,3;11,6;0,25;9,5;1,4;< 0,01
+01;0101;000000;grp;sgrp;ssgrp;19024;Yaourt nature;;251;59,9;260;62;87,1;4,32;4,4;5,04;2,5;4,6;-;0,13
+01;0101;000000;grp;sgrp;ssgrp;9100;Pâtes alimentaires cuites;;640;;650;155;64,7;5,1;5,3;30,1;0,93;0,7;1,8;0,02
+01;0101;000000;grp;sgrp;ssgrp;;Ligne sans code;;100;24;;;;1;1;4;0,1;;;
+01;0101;000000;grp;sgrp;ssgrp;24999;Aliment sans énergie;;-;-;;;;1;1;2;0;;;
+01;0101;000000;grp;sgrp;ssgrp;11000;Huile d'olive vierge extra;;3700;899;3700;899;0;0;0;0;99,9;0;0;0
