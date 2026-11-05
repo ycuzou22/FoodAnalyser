@@ -41,4 +41,5 @@ Closes #
 - [ ] Documentation / OpenAPI à jour
 - [ ] Aucun secret ni donnée personnelle réelle
 - [ ] Contrôles d'accès vérifiés sur les nouveaux endpoints (pas d'IDOR)
+- [ ] Nouveau flux de données, service tiers ou donnée personnelle : `docs/security/threat-model.md` mis à jour
 - [ ] Textes de l'interface passés par l'i18n
