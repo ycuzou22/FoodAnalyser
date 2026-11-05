@@ -6,7 +6,7 @@ COMPOSE_ENV := infra/docker/.env
 COMPOSE := docker compose -f infra/docker/compose.dev.yml --env-file $(COMPOSE_ENV)
 
 .DEFAULT_GOAL := help
-.PHONY: help install lint format test up down logs ps reset-db check-env
+.PHONY: help install lint format test up down logs ps reset-db migrate check-env
 
 help: ## Affiche cette aide
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
@@ -37,6 +37,7 @@ check-env:
 
 up: check-env ## Démarre PostgreSQL, Redis, RabbitMQ, MinIO et l'API (http://localhost:8000)
 	$(COMPOSE) up -d --build --wait
+	$(COMPOSE) exec api alembic upgrade head
 	@echo "✔ API : http://localhost:8000/docs · RabbitMQ : http://localhost:15672 · MinIO : http://localhost:9001"
 
 down: check-env ## Arrête l'environnement (les données sont conservées)
@@ -53,3 +54,7 @@ reset-db: check-env ## Repart d'une base PostgreSQL vide
 	$(COMPOSE) rm -f postgres
 	docker volume rm -f foodanalyser_pg-data
 	$(COMPOSE) up -d --wait postgres api
+	$(COMPOSE) exec api alembic upgrade head
+
+migrate: check-env ## Applique les migrations de base de données
+	$(COMPOSE) exec api alembic upgrade head

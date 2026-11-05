@@ -43,7 +43,8 @@ Tous les ports sont publiés sur `127.0.0.1` uniquement. Pour changer un port d�
 | `make down` | Arrête tout, données conservées |
 | `make logs` / `make logs s=api` | Suit les logs |
 | `make ps` | État des conteneurs |
-| `make reset-db` | Supprime le volume PostgreSQL et repart d'une base vide |
+| `make migrate` | Applique les migrations Alembic |
+| `make reset-db` | Supprime le volume PostgreSQL, repart d'une base vide et applique les migrations |
 
 ## 5. Développer l'API
 

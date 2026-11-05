@@ -103,6 +103,8 @@ services:
     volumes:
       # Code monté en lecture seule : uvicorn --reload recharge à chaque modification.
       - ../../services/api/app:/app/app:ro
+      - ../../services/api/migrations:/app/migrations:ro
+      - ../../services/api/alembic.ini:/app/alembic.ini:ro
     ports:
       - '127.0.0.1:${API_PORT:-8000}:8000'
     depends_on:
