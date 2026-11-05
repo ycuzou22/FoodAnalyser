@@ -14,6 +14,8 @@ export default tseslint.config(
       '**/coverage/**',
       '**/.venv/**',
       'services/**',
+      // Chaque application a son propre eslint.config.js (règles React) et son job de CI.
+      'apps/**',
     ],
   },
   js.configs.recommended,
