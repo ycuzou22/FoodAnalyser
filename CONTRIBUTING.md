@@ -23,6 +23,7 @@ Toutes les règles détaillées sont dans [docs/conventions.md](docs/conventions
 - [ ] Lint, typage et analyse de sécurité verts
 - [ ] Documentation mise à jour (README, OpenAPI, ADR si décision)
 - [ ] Aucun secret, aucune donnée personnelle réelle dans le code ou les fixtures
+- [ ] Modèle de menaces mis à jour si la PR ajoute un flux de données ou un service tiers
 - [ ] PR relue et approuvée
 
 ## Intégration continue
